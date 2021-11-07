@@ -93,7 +93,7 @@ namespace TalentCity.GameModes.Multiplication
             for (int i = 0; i < _difficulty; i++)
             {
                 var particalRelult = (particalMultipliers[i] * _firstValue).ToString();
-                string emptySpace = "<color=white>";
+                string emptySpace = string.Empty;
                 for (int j = 0; j < i; j++)
                 {
                     emptySpace += "_";
@@ -130,7 +130,7 @@ namespace TalentCity.GameModes.Multiplication
             for (int line = 0; line < _currentInputLineIndex; line++)
             {
                 int textLineIndex = _inputLines[line].textLineIndex;
-                _textLines[textLineIndex].text = _inputLines[line].enteredResult + _inputLines[line].emptySpaceTail;
+                _textLines[textLineIndex].text = _inputLines[line].enteredResult + "<color=white>" + _inputLines[line].emptySpaceTail;
             }
 
             //показываем нижнюю разделительную черту если осталось посчитать итоговый результат (сумма промежуточных значений)
@@ -151,14 +151,57 @@ namespace TalentCity.GameModes.Multiplication
         private void RefreshCurrentInputLine()
         {
             var currentInputLine = _inputLines[_currentInputLineIndex];
-            string textToShow = currentInputLine.enteredResult + currentInputLine.emptySpaceTail;
+            string textToShow = currentInputLine.enteredResult + "<color=white>" + currentInputLine.emptySpaceTail;
             if (currentInputLine.leftDigitsToEnter > 0)
             {
                 textToShow = "<color=#007FFF>?</color>" + textToShow;
+
+                //если осталось только посчитать итоговый результат (этап суммирования строк)
+                if (_currentInputLineIndex == _inputLines.Count - 1)
+                {
+                    var columnIndex = currentInputLine.expectedResult.Length - currentInputLine.leftDigitsToEnter;
+                    HighlightColumn(columnIndex);
+                }
             }
             
             int textLineIndex = currentInputLine.textLineIndex;
             _textLines[textLineIndex].text = textToShow;
+        }
+
+        private void HighlightColumn(int columnIndex)
+        {
+            for (int i = 0; i < _inputLines.Count - 1; i++)
+            {
+                var textLineIndex = _inputLines[i].textLineIndex;
+                string highlightedResult = _inputLines[i].enteredResult + _inputLines[i].emptySpaceTail;
+                if (highlightedResult.Length > columnIndex)
+                {
+                    int invertedIndex = highlightedResult.Length - columnIndex - 1;
+                    char symbol = highlightedResult[invertedIndex];
+                    if (char.IsDigit(symbol))
+                    {
+                        highlightedResult = highlightedResult.Insert(invertedIndex + 1, "</color>");
+                        highlightedResult = highlightedResult.Insert(invertedIndex, "<color=#007FFF>");
+                    }
+                }
+                
+                if (_inputLines[i].emptySpaceTail.Length > 0)
+                {
+                    highlightedResult = highlightedResult.Insert(highlightedResult.Length - _inputLines[i].emptySpaceTail.Length, "<color=white>");
+                }
+
+                _textLines[textLineIndex].text = highlightedResult;
+            }
+        }
+        
+        private void DisableColumnHighlighting()
+        {
+            for (int i = 0; i < _inputLines.Count - 1; i++)
+            {
+                var textLineIndex = _inputLines[i].textLineIndex;
+                string unhighlightedResult = _inputLines[i].enteredResult + "<color=white>" + _inputLines[i].emptySpaceTail;
+                _textLines[textLineIndex].text = unhighlightedResult;
+            }
         }
 
         public void OnDigitInput(int digit)
@@ -177,10 +220,12 @@ namespace TalentCity.GameModes.Multiplication
                 }
                 else
                 {
+                    DisableColumnHighlighting();
                     OnCompleteExample();
                 }
             }
         }
+        
 
         public void OnCompleteExample()
         {
