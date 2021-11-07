@@ -15,9 +15,10 @@ namespace TalentCity.GameModes
     
     public class GameModeManager : MonoBehaviour
     {
-        public GameModeManager instance;
+        public static GameModeManager instance;
 
         private Dictionary<GameMode, string> _gameModesPrefabsDictionary;
+        private GameModeBase _currentGameMode;
 
         private void Awake()
         {
@@ -40,8 +41,8 @@ namespace TalentCity.GameModes
         {
             var pathPrefab = _gameModesPrefabsDictionary[gameMode];
             var objectPrefab = Resources.Load<GameObject>(pathPrefab);
-            var gameModeBase = Instantiate(objectPrefab, transform).GetComponent<GameModeBase>();
-            gameModeBase.Execute();
+            _currentGameMode = Instantiate(objectPrefab, transform).GetComponent<GameModeBase>();
+            _currentGameMode.Execute();
         }
 
         //unity event
@@ -60,6 +61,11 @@ namespace TalentCity.GameModes
         public void StartMultiplication()
         {
             ExecuteGameMode(GameMode.Multiplication);
+        }
+
+        public void ExitCurrentGameMode()
+        {
+            _currentGameMode?.Exit();
         }
         
     
