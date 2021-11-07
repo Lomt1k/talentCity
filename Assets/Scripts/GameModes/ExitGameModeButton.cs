@@ -8,4 +8,12 @@ public class ExitGameModeButton : MonoBehaviour
     {
         GameModeManager.instance.ExitCurrentGameMode();
     }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            OnClick();
+        }
+    }
 }
