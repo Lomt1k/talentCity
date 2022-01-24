@@ -17,6 +17,8 @@ public class BackButtonHandler : MonoBehaviour
         if (exitFromGameMode)
             return;
         
+        #if !PLATFORM_WEBGL && !UNITY_EDITOR
         Application.Quit();
+        #endif
     }
 }

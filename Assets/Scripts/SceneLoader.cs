@@ -10,6 +10,10 @@ namespace TalentCity
 
         private void Start()
         {
+            #if PLATFORM_WEBGL
+            LoadScene();
+            return;
+            #endif
             Invoke(nameof(LoadScene), _timeToLoad);
         }
 
