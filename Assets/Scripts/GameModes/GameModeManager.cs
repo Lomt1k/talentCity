@@ -63,9 +63,13 @@ namespace TalentCity.GameModes
             ExecuteGameMode(GameMode.Multiplication);
         }
 
-        public void ExitCurrentGameMode()
+        public bool TryExitCurrentGameMode()
         {
-            _currentGameMode?.Exit();
+            if (_currentGameMode == null)
+                return false;
+            
+            _currentGameMode.Exit();
+            return true;
         }
         
     
